@@ -5,8 +5,16 @@ Command: npx gltfjsx@6.2.3 public/models/648ad8b8aed2c458814f185e.glb
 
 import React, { useEffect, useRef } from 'react'
 import { useAnimations, useFBX, useGLTF } from '@react-three/drei'
+import { useControls } from 'leva'
+import { useFrame } from '@react-three/fiber'
 
 export function Avatar(props) {
+
+  const { headFollow } = useControls({
+    headFollow: false,
+
+  })
+
   const group = useRef()
   const { nodes, materials } = useGLTF('models/648ad8b8aed2c458814f185e.glb')
 
@@ -15,6 +23,12 @@ export function Avatar(props) {
   typingAnimation[0].name = 'Typing'
 
   const { actions } = useAnimations(typingAnimation, group)
+
+  useFrame((state) => {
+    if (headFollow) {
+      group.current.getObjectByName('Head').lookAt(state.camera.position)
+    }
+  })
 
   useEffect(() => {
     actions['Typing'].reset().play()
